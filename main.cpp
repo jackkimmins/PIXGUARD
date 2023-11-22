@@ -57,7 +57,7 @@ public:
         png_destroy_write_struct(&png, &info);
     }
 
-    std::vector<unsigned char> loadFromPng(const std::string& filename) {
+    std::vector<unsigned char> LoadFromPng(const std::string& filename) {
         std::vector<unsigned char> image;
         FILE* fp = fopen(filename.c_str(), "rb");
         if (!fp) std::abort();
@@ -132,7 +132,6 @@ public:
 };
 
 int main() {
-    // // Ask the user to enter a key
     std::string userKey;
     std::cout << "Enter a key: ";
     std::getline(std::cin, userKey);
@@ -140,7 +139,6 @@ int main() {
     AESCryptor aesCryptor(userKey);
     PNGWriter pngCryptor;
 
-    // // Your UTF-8 encoded string
     std::string plaintext = "Hello, World!";
     std::cout << "Enter a string: ";
     std::getline(std::cin, plaintext);
@@ -148,16 +146,13 @@ int main() {
     std::string ciphertext = aesCryptor.Encrypt(plaintext);
     pngCryptor.SaveToPng(pngCryptor.StringToBytes(ciphertext), "encrypted.png");
 
-    // Output the encrypted string
     std::cout << "Encrypted String: " << ciphertext << std::endl;
 
-    // Decode the encrypted string
-    ciphertext = pngCryptor.BytesToString(pngCryptor.loadFromPng("encrypted.png"));
+    ciphertext = pngCryptor.BytesToString(pngCryptor.LoadFromPng("encrypted.png"));
 
 
     std::string decryptedtext = aesCryptor.Decrypt(ciphertext);
 
-    // Output the original string
     std::cout << "Decrypted String: " << decryptedtext << std::endl;
 
     return 0;
