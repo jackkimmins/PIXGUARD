@@ -1,0 +1,16 @@
+blue
+red
+green
+yellow
+purple
+orange
+aqua
+beige
+brown
+cyan
+indigo
+violet
+magenta
+maroon
+olive
+navy
