@@ -8,8 +8,52 @@
 #include <cmath>
 #include <png.h>
 #include <cryptopp/base64.h>
+#include <sstream>
 
 using namespace CryptoPP;
+
+class TextEncoder
+{
+public:
+      // Word lists for each part of speech
+    const std::vector<std::string> adjectives = {"quick", "lazy", "sleepy"};
+    const std::vector<std::string> nouns = {"fox", "dog", "cat"};
+    const std::vector<std::string> verbs = {"jumps", "runs", "sleeps"};
+    const std::vector<std::string> adverbs = {"quickly", "slowly", "quietly"};
+
+    // Sentence template
+    const std::string sentenceTemplate = "The [adjective] [noun] [verb] [adverb].";
+
+    // Function to encode data to sentences
+    std::string Encode(const std::string& data) {
+        std::string encoded;
+        for (char c : data) {
+            // Example encoding using the first letter of each word list
+            encoded += "The " + adjectives[c % adjectives.size()] + " " +
+                       nouns[c % nouns.size()] + " " +
+                       verbs[c % verbs.size()] + " " +
+                       adverbs[c % adverbs.size()] + ". ";
+        }
+        return encoded;
+    }
+
+    // Function to decode sentences to data
+    std::string Decode(const std::string& sentences) {
+        std::string decoded;
+        std::istringstream iss(sentences);
+        std::string word;
+
+        // Example decoding: simply taking the first character of each word
+        while (iss >> word) {
+            if (word == "The") {
+                continue;
+            }
+            decoded += word[0];  // Simplified for demonstration
+        }
+
+        return decoded;
+    }
+};
 
 class PNGWriter
 {
@@ -26,7 +70,7 @@ public:
         return str;
     }
 
-    void SaveToPng(const std::vector<unsigned char>& bytes, const std::string& filename) {
+    void Encode(const std::vector<unsigned char>& bytes, const std::string& filename) {
         size_t pixelCount = std::ceil(static_cast<double>(bytes.size()) / 3.0);
         size_t side = std::ceil(std::sqrt(pixelCount)), height = (pixelCount + side - 1) / side;
 
@@ -57,7 +101,7 @@ public:
         png_destroy_write_struct(&png, &info);
     }
 
-    std::vector<unsigned char> LoadFromPng(const std::string& filename) {
+    std::vector<unsigned char> Decode(const std::string& filename) {
         std::vector<unsigned char> image;
         FILE* fp = fopen(filename.c_str(), "rb");
         if (!fp) std::abort();
@@ -138,17 +182,21 @@ int main() {
 
     AESCryptor aesCryptor(userKey);
     PNGWriter pngCryptor;
+    TextEncoder textEncoder;
 
     std::string plaintext = "Hello, World!";
     std::cout << "Enter a string: ";
     std::getline(std::cin, plaintext);
 
     std::string ciphertext = aesCryptor.Encrypt(plaintext);
-    pngCryptor.SaveToPng(pngCryptor.StringToBytes(ciphertext), "encrypted.png");
+    std::string textEncode = textEncoder.Encode(ciphertext);
+    std::cout << "Text Encoded String: " << textEncode << std::endl;
+    std::cout << "Text Decoded String: " << textEncoder.Decode(textEncode) << std::endl;
+    pngCryptor.Encode(pngCryptor.StringToBytes(ciphertext), "encrypted.png");
 
     std::cout << "Encrypted String: " << ciphertext << std::endl;
 
-    ciphertext = pngCryptor.BytesToString(pngCryptor.LoadFromPng("encrypted.png"));
+    ciphertext = pngCryptor.BytesToString(pngCryptor.Decode("encrypted.png"));
 
 
     std::string decryptedtext = aesCryptor.Decrypt(ciphertext);
