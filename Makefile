@@ -1,14 +1,12 @@
-# Makefile for AES Encryption/Decryption program
+CXX := g++													# Compiler
+CXXFLAGS := -std=c++20 -g -Wall								# Compiler flags
+CPPFLAGS := -I/usr/include/cryptopp -I/usr/local/include	# Preprocessor flags
+LDFLAGS := -L/usr/lib -L/usr/include/lib					# Linker flags
+LDLIBS := -lcryptopp -lpng									# Libraries to link
 
-CXX := g++                     # Compiler
-CXXFLAGS := -std=c++20 -g -Wall  # Compiler flags
-CPPFLAGS := -I/usr/include/cryptopp -I/usr/local/include
-LDFLAGS := -L/usr/lib -L/usr/include/lib
-LDLIBS := -lcryptopp -lpng     # Libraries to link
-
-SRC := main.cpp  # Source file
-OBJ := $(SRC:.cpp=.o)  # Object file
-EXEC := main  # Executable output
+SRC := main.cpp			# Source file
+OBJ := $(SRC:.cpp=.o)	# Object file
+EXEC := main			# Executable output
 
 .PHONY: all clean
 
