@@ -104,13 +104,6 @@ public:
 };
 
 template<typename Key>
-void saveKey(const Key& key, const std::string& filename) {
-    Base64Encoder encoder(new FileSink(filename.c_str()));
-    key.DEREncode(encoder);
-    encoder.MessageEnd();
-}
-
-template<typename Key>
 void SaveKey(const Key& key, const std::string& filename) {
     Base64Encoder keySink(new FileSink(filename.c_str()));
     key.DEREncode(keySink);
@@ -122,8 +115,8 @@ int main() {
     auto [publicKey, privateKey] = rsa.GenerateKeys();
 
     // Save keys to files
-    SaveKey(publicKey, "keys/publicKey.txt");
-    SaveKey(privateKey, "keys/privateKey.txt");
+    SaveKey(publicKey, "keys/publicKey.key");
+    SaveKey(privateKey, "keys/privateKey.key");
 
     // Example string
     std::string plainText = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.";
