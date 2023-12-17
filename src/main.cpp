@@ -62,16 +62,12 @@ public:
         std::string combined = rsaEncryptedKey + std::string(reinterpret_cast<const char*>(iv.data()), iv.size()) + aesCipherText;
 
         // Convert to hex format
-        std::string hexCombined;
-        StringSource ss3(combined, true, new HexEncoder(new StringSink(hexCombined)));
-
-        return hexCombined;
+        return DataConverter::ToHex(combined);
     }
 
     std::string Decrypt(const RSA::PrivateKey& privateKey, const std::string& hexCipherText) {
         // Convert from hex format
-        std::string cipherText;
-        StringSource ss1(hexCipherText, true, new HexDecoder(new StringSink(cipherText)));
+        std::string cipherText = DataConverter::FromHex(hexCipherText);
 
         // Split into RSA-encrypted AES key, IV, and AES-encrypted message
         std::string rsaEncryptedKey = cipherText.substr(0, privateKey.MaxPreimage().ByteCount());

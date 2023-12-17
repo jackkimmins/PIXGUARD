@@ -7,21 +7,32 @@ public:
                 new CryptoPP::StringSink(hexText), false, 2, ":"
             )
         );
+
+        // Remove the trailing colon if present
+        if (!hexText.empty() && hexText.back() == ':') {
+            hexText.pop_back();
+        }
+
         return hexText;
     }
 
     static std::string FromHex(const std::string& hexText) {
+        // Remove colons from the input string
         std::string filteredText;
-        CryptoPP::StringSource ss(hexText, true,
+        for (char ch : hexText) {
+            if (ch != ':') {
+                filteredText += ch;
+            }
+        }
+
+        // Decode the filtered hex string
+        std::string binaryText;
+        CryptoPP::StringSource ss(filteredText, true,
             new CryptoPP::HexDecoder(
-                new CryptoPP::StringSink(filteredText)
+                new CryptoPP::StringSink(binaryText)
             )
         );
-        
-        std::string binaryText;
-        CryptoPP::StringSource(filteredText, true,
-            new CryptoPP::StringSink(binaryText)
-        );
+
         return binaryText;
     }
 
