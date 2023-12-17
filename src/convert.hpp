@@ -1,6 +1,6 @@
 class DataConverter {
 public:
-    std::string ToHex(const std::string& binaryText) {
+    static std::string ToHex(const std::string& binaryText) {
         std::string hexText;
         CryptoPP::StringSource ss(binaryText, true,
             new CryptoPP::HexEncoder(
@@ -10,7 +10,7 @@ public:
         return hexText;
     }
 
-    std::string FromHex(const std::string& hexText) {
+    static std::string FromHex(const std::string& hexText) {
         std::string filteredText;
         CryptoPP::StringSource ss(hexText, true,
             new CryptoPP::HexDecoder(
@@ -25,7 +25,7 @@ public:
         return binaryText;
     }
 
-    std::string ToBase64(const std::string& binaryText) {
+    static std::string ToBase64(const std::string& binaryText) {
         std::string base64Text;
         CryptoPP::StringSource ss(binaryText, true,
             new CryptoPP::Base64Encoder(
@@ -35,7 +35,7 @@ public:
         return base64Text;
     }
 
-    std::string FromBase64(const std::string& base64Text) {
+    static std::string FromBase64(const std::string& base64Text) {
         std::string binaryText;
         CryptoPP::StringSource ss(base64Text, true,
             new CryptoPP::Base64Decoder(
