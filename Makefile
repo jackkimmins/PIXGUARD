@@ -4,7 +4,7 @@ CPPFLAGS := -I/usr/include/cryptopp -I/usr/local/include	# Preprocessor flags
 LDFLAGS := -L/usr/lib -L/usr/include/lib					# Linker flags
 LDLIBS := -lcryptopp -lpng									# Libraries to link
 
-SRC := main.cpp			# Source file
+SRC := src/main.cpp			# Source file
 OBJ := $(SRC:.cpp=.o)	# Object file
 EXEC := main			# Executable output
 

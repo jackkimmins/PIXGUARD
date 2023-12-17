@@ -9,51 +9,33 @@
 #include <png.h>
 #include <cryptopp/base64.h>
 #include <sstream>
+#include <unordered_map>
+#include <iomanip>
 
 using namespace CryptoPP;
 
-class TextEncoder
-{
+class TextEncoder {
 public:
-      // Word lists for each part of speech
-    const std::vector<std::string> adjectives = {"quick", "lazy", "sleepy"};
-    const std::vector<std::string> nouns = {"fox", "dog", "cat"};
-    const std::vector<std::string> verbs = {"jumps", "runs", "sleeps"};
-    const std::vector<std::string> adverbs = {"quickly", "slowly", "quietly"};
-
-    // Sentence template
-    const std::string sentenceTemplate = "The [adjective] [noun] [verb] [adverb].";
-
-    // Function to encode data to sentences
-    std::string Encode(const std::string& data) {
-        std::string encoded;
-        for (char c : data) {
-            // Example encoding using the first letter of each word list
-            encoded += "The " + adjectives[c % adjectives.size()] + " " +
-                       nouns[c % nouns.size()] + " " +
-                       verbs[c % verbs.size()] + " " +
-                       adverbs[c % adverbs.size()] + ". ";
+    std::string Encode(const std::string& ssir) {
+        static const char *hex = "0123456789ABCDEF";
+        std::string result;
+        result.reserve(ssir.size() * 3);
+        for (std::string::const_iterator i = ssir.begin(), end = ssir.end(); i != end; ++i) {
+            if (i != ssir.begin())
+                result.push_back(':');
+            result.push_back(hex[*i >> 4]);
+            result.push_back(hex[*i & 0xf]);
         }
-        return encoded;
+
+        return result;
     }
 
-    // Function to decode sentences to data
     std::string Decode(const std::string& sentences) {
-        std::string decoded;
-        std::istringstream iss(sentences);
-        std::string word;
-
-        // Example decoding: simply taking the first character of each word
-        while (iss >> word) {
-            if (word == "The") {
-                continue;
-            }
-            decoded += word[0];  // Simplified for demonstration
-        }
-
-        return decoded;
+        return "test";
     }
 };
+
+
 
 class PNGWriter
 {
@@ -82,6 +64,7 @@ public:
         if (!png || !info || setjmp(png_jmpbuf(png))) std::abort();
 
         png_init_io(png, fp);
+        png_set_compression_level(png, 0);
         png_set_IHDR(png, info, side, height, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
         png_write_info(png, info);
 
@@ -192,14 +175,12 @@ int main() {
     std::string textEncode = textEncoder.Encode(ciphertext);
     std::cout << "Text Encoded String: " << textEncode << std::endl;
     std::cout << "Text Decoded String: " << textEncoder.Decode(textEncode) << std::endl;
+
     pngCryptor.Encode(pngCryptor.StringToBytes(ciphertext), "encrypted.png");
-
     std::cout << "Encrypted String: " << ciphertext << std::endl;
-
     ciphertext = pngCryptor.BytesToString(pngCryptor.Decode("encrypted.png"));
 
-
-    std::string decryptedtext = aesCryptor.Decrypt(ciphertext);
+    std::string decryptedtext = aesCryptor.Decrypt(textEncoder.Decode(textEncode));
 
     std::cout << "Decrypted String: " << decryptedtext << std::endl;
 
